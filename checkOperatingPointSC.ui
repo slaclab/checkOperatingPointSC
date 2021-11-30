@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>914</width>
+    <height>697</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QTableWidget" name="tableWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>631</width>
+     <height>701</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background color rgb(208, 214, 255)</string>
+   </property>
+   <row>
+    <property name="text">
+     <string>Machine repetiton rate</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>Laser pulse length (FWHM)</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>Laser iris diameter</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>Laser power</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>Laser phase</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>Bunch charge</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>Gun Voltage (energy gain)</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L0b voltage (energy gain)</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L0b phase</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L1b voltage (energy gain)</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L1b phase</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L2b voltage (energy gain)</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L2b phase</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L3b voltage (energy gain)</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L3b phase</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>BC1b E0</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>BC1b R56</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>Peak current after BC1</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>BC1b injector phase</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>BC2b E0</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>BC2 R56</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>Peak current after BC2</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>BC2b injector phase</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>Final electron energy</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>rms bunch length</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>x emit @ EMIT1?</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>y emit @ EMIT1?</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>x emit @ WSEMIT2</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>y emit @ WSEMIT2</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>x emit*Bmag @ LTU1</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>y emit*Bmag @ LTU1</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>Estimated FEL wavelength</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>Estimated FEL L_sat</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>Estimated FEL P_out</string>
+    </property>
+   </row>
+   <column>
+    <property name="text">
+     <string>Actual</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Target</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Notes</string>
+    </property>
+   </column>
+   <item row="25" column="2">
+    <property name="text">
+     <string>All emittance values are normalized projected.</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>150</y>
+     <width>60</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+   <property name="test" stdset="0">
+    <bool>false</bool>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
