@@ -6,233 +6,362 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>914</width>
-    <height>697</height>
+    <width>779</width>
+    <height>899</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QTableWidget" name="tableWidget">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>631</width>
-     <height>701</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background color rgb(208, 214, 255)</string>
-   </property>
-   <row>
-    <property name="text">
-     <string>Machine repetiton rate</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>Laser pulse length (FWHM)</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>Laser iris diameter</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>Laser power</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>Laser phase</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>Bunch charge</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>Gun Voltage (energy gain)</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>L0b voltage (energy gain)</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>L0b phase</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>L1b voltage (energy gain)</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>L1b phase</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>L2b voltage (energy gain)</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>L2b phase</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>L3b voltage (energy gain)</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>L3b phase</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>BC1b E0</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>BC1b R56</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>Peak current after BC1</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>BC1b injector phase</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>BC2b E0</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>BC2 R56</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>Peak current after BC2</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>BC2b injector phase</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>Final electron energy</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>rms bunch length</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>x emit @ EMIT1?</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>y emit @ EMIT1?</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>x emit @ WSEMIT2</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>y emit @ WSEMIT2</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>x emit*Bmag @ LTU1</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>y emit*Bmag @ LTU1</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>Estimated FEL wavelength</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>Estimated FEL L_sat</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>Estimated FEL P_out</string>
-    </property>
-   </row>
-   <column>
-    <property name="text">
-     <string>Actual</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Target</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Notes</string>
-    </property>
-   </column>
-   <item row="25" column="2">
-    <property name="text">
-     <string>All emittance values are normalized projected.</string>
-    </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="22" column="0">
+    <widget class="QLabel" name="label_24">
+     <property name="text">
+      <string>y emit @ EMIT1?</string>
+     </property>
+    </widget>
    </item>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>180</x>
-     <y>150</y>
-     <width>60</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>TextLabel</string>
-   </property>
-   <property name="test" stdset="0">
-    <bool>false</bool>
-   </property>
-  </widget>
+   <item row="4" column="1">
+    <widget class="PyDMLabel" name="PyDMLabel_6">
+     <property name="toolTip">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="PyDMLabel" name="PyDMLabel_5">
+     <property name="toolTip">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="27" column="0">
+    <widget class="QLabel" name="label_29">
+     <property name="text">
+      <string>Estimated FEL wavelength</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Laser power</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_15">
+     <property name="text">
+      <string>Laser pulse length</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
+      <string>BC1b E0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="16" column="0">
+    <widget class="QLabel" name="label_19">
+     <property name="text">
+      <string>BC2b R56</string>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="0">
+    <widget class="QLabel" name="label_18">
+     <property name="text">
+      <string>BC2b E0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="3">
+    <widget class="QLabel" name="label_17">
+     <property name="text">
+      <string>Energy gain</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="3">
+    <widget class="QLabel" name="label_16">
+     <property name="text">
+      <string>(ps) FWHM</string>
+     </property>
+    </widget>
+   </item>
+   <item row="20" column="0">
+    <widget class="QLabel" name="label_22">
+     <property name="text">
+      <string>rms bunch length</string>
+     </property>
+    </widget>
+   </item>
+   <item row="23" column="0">
+    <widget class="QLabel" name="label_25">
+     <property name="text">
+      <string>x emit @ WSEMIT2</string>
+     </property>
+    </widget>
+   </item>
+   <item row="21" column="0">
+    <widget class="QLabel" name="label_23">
+     <property name="text">
+      <string>x emit @ EMIT1?</string>
+     </property>
+    </widget>
+   </item>
+   <item row="26" column="0">
+    <widget class="QLabel" name="label_28">
+     <property name="text">
+      <string>y emit*Bmag @ LTU1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="24" column="0">
+    <widget class="QLabel" name="label_26">
+     <property name="text">
+      <string>y emit @ WSEMIT2</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="PyDMLabel" name="PyDMLabel_9">
+     <property name="toolTip">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Laser iris diameter</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Bunch charge</string>
+     </property>
+    </widget>
+   </item>
+   <item row="25" column="0">
+    <widget class="QLabel" name="label_27">
+     <property name="text">
+      <string>x emit*Bmag @ LTU1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="0">
+    <widget class="QLabel" name="label_14">
+     <property name="text">
+      <string>BC1b injector phase</string>
+     </property>
+    </widget>
+   </item>
+   <item row="18" column="0">
+    <widget class="QLabel" name="label_20">
+     <property name="text">
+      <string>BC2b injector phase</string>
+     </property>
+    </widget>
+   </item>
+   <item row="19" column="0">
+    <widget class="QLabel" name="label_21">
+     <property name="text">
+      <string>Final electron energy</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="1">
+    <widget class="PyDMLabel" name="PyDMLabel_10">
+     <property name="toolTip">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="28" column="0">
+    <widget class="QLabel" name="label_30">
+     <property name="text">
+      <string>Estmated FEL L_sat</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="4">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="2">
+    <widget class="PyDMLabel" name="PyDMLabel_2">
+     <property name="toolTip">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="PyDMLabel" name="reprate">
+     <property name="toolTip">
+      <string/>
+     </property>
+     <property name="text">
+      <string>repRate</string>
+     </property>
+     <property name="alarmSensitiveContent" stdset="0">
+      <bool>true</bool>
+     </property>
+     <property name="channel" stdset="0">
+      <string>TPR:LGUN:TS01:0:CH00_RATE</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="PyDMLabel" name="PyDMLabel_3">
+     <property name="toolTip">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Actual</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Machine Rep Rate</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Target</string>
+     </property>
+    </widget>
+   </item>
+   <item row="30" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>Gun Voltage</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string>BC1b R56</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Laser phase</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0">
+    <widget class="QLabel" name="label_11">
+     <property name="text">
+      <string>Peak current after BC1b</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="PyDMLabel" name="PyDMLabel">
+     <property name="toolTip">
+      <string/>
+     </property>
+     <property name="channel" stdset="0">
+      <string>TORO:GUNB:360:CHRG</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="QLabel" name="label_12">
+     <property name="text">
+      <string>Units &amp; Notes</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="2">
+    <widget class="PyDMLabel" name="PyDMLabel_4">
+     <property name="toolTip">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="PyDMLabel" name="PyDMLabel_7">
+     <property name="toolTip">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="PyDMLabel" name="PyDMLabel_8">
+     <property name="toolTip">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="17" column="0">
+    <widget class="QLabel" name="label_13">
+     <property name="text">
+      <string>Peak current after BC2b</string>
+     </property>
+    </widget>
+   </item>
+   <item row="29" column="0">
+    <widget class="QLabel" name="label_31">
+     <property name="text">
+      <string>Estimated FEL P_out</string>
+     </property>
+    </widget>
+   </item>
+   <item row="21" column="3">
+    <widget class="QLabel" name="label_32">
+     <property name="text">
+      <string>All emittance values are normalized projected.</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PyDMLabel</class>
+   <extends>QLabel</extends>
+   <header>pydm.widgets.label</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
