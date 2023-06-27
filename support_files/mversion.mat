@@ -1,0 +1,722 @@
+function newOP = checkOperatingPoint ( varargin )
+%      the existing singleton*.
+% CHECKOPERATINGPOINT M-file for checkOperatingPoint.fig
+%      CHECKOPERATINGPOINT initializes the Operating Point (OP)
+%      structure and updates it with the readbacks from the
+%      LCLS control system. It can be called with the following
+%      three parameter configurations:
+%
+%      OP = CHECKOPERATINGPOINT ( logbook ) lists the operating
+%      point information to the terminal screen in one of two
+%      formats:
+%          (1) logbook = true:  in wiki logbook format
+%          (2) logbook = false: in plain text format
+%
+%      OP = CHECKOPERATINGPOINT returns the initialized
+%      OperatingPoint structure OP.
+%
+%      OP = CHECKOPERATINGPOINT ( OP ) refreshes the readbacks in the
+%      OperatingPoint structure OP.
+%
+% Last Modified by WSC on 23-June-2010
+% Last Modified by HDN on 11-July-2014 
+
+
+
+if ( initialize )
+    PhysicsConsts   = util_PhysicsConstants;
+    UndulatorConsts = util_UndulatorConstants;
+    OP              = cell  ( 1, 1 );
+    OPctrl.saved    = false;
+    OPctrl.bufSize  = 20;                           % Number of integration samples for peak current averaging.
+    OPctrl.IpkBuf   = zeros ( 1, OPctrl.bufSize );
+    OPctrl.Ipklvl   = 0;
+end
+
+% NOTE 1: The display order of the parameters is determined after the
+% definition. Parameters are only displayed if they are given a display
+% order.
+    
+    % The following statement determines if and at which position
+    % a parameter will be displayed.
+    
+    OPctrl.order = [                            ...
+                     OPctrl.ID.BeamRate,        ...
+                     OPctrl.ID.LaserPlsLen,     ...
+                     OPctrl.ID.LasrIrisDia,     ...
+                     OPctrl.ID.BunchCharge,     ...
+                     OPctrl.ID.GunVoltage,      ...
+                     OPctrl.ID.LaserPhase,      ...
+                     OPctrl.ID.L0aVoltage,      ...
+                     OPctrl.ID.L0aPhase,        ...
+                     OPctrl.ID.L0bVoltage,      ...
+                     OPctrl.ID.L0bPhase,        ...
+                     OPctrl.ID.L1SVoltage,      ...
+                     OPctrl.ID.L1SPhase,        ...
+                     OPctrl.ID.L1XVoltage,      ...
+                     OPctrl.ID.L1XPhase,        ...
+                     OPctrl.ID.BC1offset,       ...
+                     OPctrl.ID.BC1_E0,          ...
+                     OPctrl.ID.BC1_R56,         ...
+                     OPctrl.ID.BC1_IPK,         ...
+                     OPctrl.ID.L2Phase,         ...
+                     OPctrl.ID.BC2offset,       ...
+                     OPctrl.ID.BC2_E0,          ...
+                     OPctrl.ID.BC2_R56,         ...
+                     OPctrl.ID.BC2_IPK,         ...
+                     OPctrl.ID.BC1_InjPhase,    ...
+                     OPctrl.ID.BC2_InjPhase,    ...
+                     OPctrl.ID.BC1_2_InjPhase,  ...
+                     OPctrl.ID.L3Phase,         ...
+                     OPctrl.ID.FinalEnergy,     ...
+                     OPctrl.ID.BC2_BLEN,        ...
+                     OPctrl.ID.OTR2_P_EMITN_X,  ...
+                     OPctrl.ID.OTR2_P_EMITN_Y,  ...
+                     OPctrl.ID.WS12_P_EMITN_X,  ...
+                     OPctrl.ID.WS12_P_EMITN_Y,  ...
+                     OPctrl.ID.LI28_P_EMITN_X,  ...
+                     OPctrl.ID.LI28_P_EMITN_Y,  ...
+                     OPctrl.ID.LTUH_P_EMITN_X,  ...	 
+                     OPctrl.ID.LTUH_P_EMITN_Y,  ...	 
+                     OPctrl.ID.FEL_LAMBDA_R,    ...
+                     OPctrl.ID.FEL_L_SAT_C,     ...
+                     OPctrl.ID.FEL_P_OUT_C      ...
+                   ];
+
+% LIST OF NEW SIGNALS TO BE ADDED.
+%                     OPctrl.ID.GunPhase,        ...
+% ---- END OF LIST OF NEW SIGNALS ----
+
+% Remove name prefix that are used in the SIOC parameter name
+% Take a new reading of the Actual values.
+
+
+function c = precComp ( v1, v2, p )
+
+c = round (  (v1 - v2 ) * 10^( p + 1 ) ) * 10^( -( p + 1 ) );
+
+end
+
+% Callback Functions for Actual and Target values.
+
+function [ v, t ] = IrisAngle2Diameter_Actual ( PV )
+
+%%Iris.angle = [  25.9,  56.0,  86.0, 116.0, 146.1, 176.1, 206.0, 236.0, 266.0, 296.0, 326.0, 256.0 ];
+%%Iris.dia   = [   0.25,  0.5,   0.6,   0.7,   0.8,   0.9,   1.0,   1.2,   1.4,   1.6,   2.0,   0.0 ]; % last position is "LCLS"
+%Iris.angle = [   9.6,  39.7,  69.8,  99.8, 129.8, 159.8, 189.8, 219.7, 249.7, 279.7, 309.7, 339.4 ];
+%Iris.dia   = [   0.125, 0.25,  0.5,   0.6,   0.8,   1.0,   1.2,   1.4,   1.5,   1.6,   2.0,   0.0 ]; % last position is "LCLS"
+[ v, t ] = lcaGet ( PV );
+
+v = sscanf ( v { 1 }, '%f' );
+
+end
+
+
+function [ v, t ] = conv2nC_Actual ( PV )
+
+global PhysicsConsts;
+
+[ v, t ]  = lcaGet ( PV );
+v         = v * PhysicsConsts.echarge * 1e9; % nC
+
+end
+
+
+function v = calBC1offset_Target ( PV )
+
+global OP;
+global OPctrl;
+
+R56_T             = OP { OPctrl.ID.BC1_R56 }.Target / 1000;
+E0_T              = OP { OPctrl.ID.BC1_E0  }.Target / 1000;
+%[ BDES1, xpos_1 ] = BC1_adjust ( R56_T, E0_T );
+[ ~, xpos_1 ] = BC_adjust ( 'BC1', R56_T, E0_T );
+v                 = xpos_1 * 1000;
+
+end
+
+
+function [ v, t ] = getBC1_R56_Actual ( PV )
+
+global OP;
+global OPctrl;
+%global PhysicsConsts;
+
+R56_T       = OP { OPctrl.ID.BC1_R56 }.Target / 1000;
+E0_A        = OP { OPctrl.ID.BC1_E0  }.Actual / 1000;
+
+[ BACT, t ] = lcaGet ( PV );
+%BACT        = BACT / 10; % Tm
+
+%[ BDES, xpos, dphi_BC, theta, eta, R560, Lm, dL ] = BC1_adjust ( R56_T, E0_A );
+[ ~, ~, ~, ~, ~, R56] = BC_adjust ( 'BC1', R56_T, E0_A, BACT );
+
+%t0          = asin ( PhysicsConsts.c * BACT / ( E0_A * 1e9 ) );
+%gamsqr      = ( E0_A * 1e9 / PhysicsConsts.mc2_e )^2;
+%R56         = 2 * gamsqr * sec ( t0 ) * ( 2 * Lm * ( t0 * cot ( t0 ) - 1 ) - dL * tan ( t0 )^2 ) / ( gamsqr - 1 );
+v           = R56 * -1000;
+
+end
+
+
+function [ v, t ] = getBC1_E0_Actual ( PV )
+
+% Calculate Actual
+
+global OP;
+global OPctrl;
+global PhysicsConsts;
+
+v       = NaN;
+t       = NaN;
+
+R56_T   = OP { OPctrl.ID.BC1_R56   }.Target / 1000;
+E0_T    = OP { OPctrl.ID.BC1_E0    }.Target / 1000;
+
+%[ BDES, xpos, dphi_BC, theta, eta, R560, Lm, dL ] = BC1_adjust ( R56_T, E0_T );
+[ ~, ~, ~, ~, ~, ~, Lm, dL ] = BC_adjust ( 'BC1', R56_T, E0_T );
+
+L = Lm + dL;
+
+if ( L ~= 0 )
+%    XPOS  = OP { OPctrl.ID.BC1offset }.Target / 1000;
+    XPOS  = OP { OPctrl.ID.BC1offset }.Actual / 1000;
+    theta = atan ( XPOS / L );
+    
+    if ( theta ~= 0 )
+        [ BACT, t ] = lcaGet ( PV );
+        E0          = BACT / sin ( theta ) * 1e-10 * PhysicsConsts.c;
+
+        if ( E0 >= 0.010 && E0 <= 0.600)
+            v = E0 * 1000; % MeV
+        end
+    end
+end
+
+end
+
+
+function v = calBC1_InjectorPhase_Target ( PV )
+
+global OP;
+global OPctrl;
+
+R56_T                   = OP { OPctrl.ID.BC1_R56 }.Target / 1000;
+E0_T                    = OP { OPctrl.ID.BC1_E0  }.Target / 1000;
+%[ BDES, xpos, dphi_BC ] = BC1_adjust ( R56_T, E0_T );
+[ ~, ~, dphi_BC ]       = BC_adjust ( 'BC1', R56_T, E0_T );
+v                       = - dphi_BC;
+
+end
+
+
+function [ v, t ] = calBC1_InjectorPhase_Actual ( PV )
+
+% Calculate Actual
+
+global OP;
+global OPctrl;
+
+[ R56_A, t ]            = getBC1_R56_Actual ( PV );
+R56_A                   = R56_A / 1000;
+E0_A                    = OP { OPctrl.ID.BC1_E0  }.Actual / 1000;
+%[ BDES, xpos, dphi_BC ] = BC1_adjust ( R56_A, E0_A );
+[ ~, ~, dphi_BC ]       = BC_adjust ( 'BC1', R56_A, E0_A );
+v                       = - dphi_BC;
+
+end
+
+
+function v = calBC2offset_Target ( PV )
+
+global OP;
+global OPctrl;
+
+R56_T              = OP { OPctrl.ID.BC2_R56 }.Target / 1000;
+BC2_E0_T           = OP { OPctrl.ID.BC2_E0  }.Target;
+%[ BDES_2, xpos_2 ] = BC2_adjust ( R56_T, BC2_E0_T );
+[ ~,      xpos_2 ] = BC_adjust ( 'BC2', R56_T, BC2_E0_T );
+v                  = xpos_2 * 1000;
+
+end
+
+
+function [ v, t ] = getBC2_R56_Actual ( PV )
+
+global OP;
+global OPctrl;
+%global PhysicsConsts;
+
+R56_T       = OP { OPctrl.ID.BC2_R56 }.Target / 1000;
+BC2_E0_A    = OP { OPctrl.ID.BC2_E0  }.Actual;
+
+[ BACT, t ] = lcaGet ( PV );
+%BACT        = BACT / 10; % Tm
+
+%[ BDES, xpos, dphi_BC, theta, eta, R560, Lm, dL ] = BC2_adjust ( R56_T, BC2_E0_A );
+[ ~, ~, ~, ~, ~, R56] = BC_adjust ( 'BC2', R56_T, BC2_E0_A, BACT );
+
+
+%t0          = asin ( PhysicsConsts.c * BACT / ( BC2_E0_A * 1e9 ) );
+%gamsqr      = ( BC2_E0_A * 1e9 / PhysicsConsts.mc2_e )^2;
+%R56         = 2 * gamsqr * sec ( t0 ) * ( 2 * Lm * ( t0 * cot ( t0 ) - 1 ) - dL * tan ( t0 )^2 ) / ( gamsqr - 1 );
+v           = R56 * -1000;
+
+end
+
+
+function [ v, t ] = getBC2_EO_Actual ( PV )
+
+% Calculate Actual
+
+global OP;
+global OPctrl;
+global PhysicsConsts;
+
+v       = NaN;
+t       = NaN;
+
+R56_T   = OP { OPctrl.ID.BC2_R56   }.Target / 1000;
+E0_T    = OP { OPctrl.ID.BC2_E0    }.Target;
+
+%[ BDES, xpos, dphi_BC, theta, eta, R560, Lm, dL ] = BC2_adjust ( R56_T, E0_T );
+[ ~, ~, ~, ~, ~, ~, Lm, dL ] = BC_adjust ( 'BC2', R56_T, E0_T );
+
+L = Lm + dL;
+
+if ( L ~= 0 )
+%    XPOS  = OP { OPctrl.ID.BC2offset }.Target / 1000;
+    XPOS  = OP { OPctrl.ID.BC2offset }.Actual / 1000;
+    theta = atan ( XPOS / L );
+    
+    if ( theta ~= 0 )
+        [ BACT, t ] = lcaGet ( PV );
+        E0          = BACT / sin ( theta ) * 1e-10 * PhysicsConsts.c;
+        
+        if ( E0 >= 0.1 && E0 <= 8)
+            v = E0;
+        end
+    end
+end
+
+end
+
+
+function v = calBC2_InjectorPhase_Target ( PV )
+
+global OP;
+global OPctrl;
+
+R56_T                   = OP { OPctrl.ID.BC2_R56 }.Target / 1000;
+E0_T                    = OP { OPctrl.ID.BC2_E0  }.Target;
+%[ BDES, xpos, dphi_BC ] = BC2_adjust ( R56_T, E0_T );
+[ ~, ~, dphi_BC ]       = BC_adjust ( 'BC2', R56_T, E0_T );
+v                       = - dphi_BC;
+
+end
+
+
+function [ v, t ] = calBC2_InjectorPhase_Actual ( PV )
+
+% Calculate Actual
+
+global OP;
+global OPctrl;
+
+[ R56_A, t ]            = getBC2_R56_Actual ( PV );
+R56_A                   = R56_A / 1000;
+E0_A                    = OP { OPctrl.ID.BC2_E0  }.Actual;
+%[ BDES, xpos, dphi_BC ] = BC2_adjust ( R56_A, E0_A );
+[ ~, ~, dphi_BC ]       = BC_adjust ( 'BC2', R56_A, E0_A );
+v                       = - dphi_BC;
+
+end
+
+
+function v = calBC1_BC2_InjectorPhase_Target ( PV )
+
+global OP;
+global OPctrl;
+
+v = OP { OPctrl.ID.BC1_InjPhase }.Target + OP { OPctrl.ID.BC2_InjPhase }.Target;
+
+end
+
+
+function [ v, t ] = getFinalEnergy_Actual ( PV )
+
+[ v, t ]= lcaGet ( PV ); 
+
+
+end
+
+function [ v, t ] = getDL1Energy_Actual ( PV )	 
+ 	 
+ [ v, t ]= lcaGet ( PV ); 	 
+ v = v*1000;                     % MeV	 
+ end
+
+function c = dateComment ( j )
+
+global OP;
+
+c = sprintf ( 'Aquired on %s', OP { j }.TS );
+
+p = strfind ( OP { j }.PV, 'EMITN' );
+
+if ( any ( p ) )
+    success = true;
+
+    methodPV = strcat ( OP { j }.PV ( 1 : p - 1 ), 'FIT_METHOD' );
+
+    try
+       fitMethod = char ( lcaGet ( methodPV ) );
+    catch
+        success = false;
+    end
+    
+    if ( success )
+        n = length ( fitMethod );
+        fitMethod = strrep ( fitMethod, 'ssyme', 'symme' );
+        c = sprintf ( '%s (%s)', OP { j }.TS, fitMethod ( 1 : min ( 5, n ) ) );
+        
+    else
+        fprintf ('Failed to get method.\n' );
+    end    
+end
+
+%c = 'From most recent emittance scan';
+
+end
+
+function [ v, t ] = calBC2_IPK_Actual ( PV )
+
+% Calculate Actual
+
+%global OPctrl;
+
+v          = NaN;
+
+[ IPK, t ] = lcaGet ( PV );                               % A
+IPK        = IPK ( end - 35 : end );
+indx       = find ( IPK == 0 );
+L          = length ( indx );
+if ( L >=1 && L <=3)
+   IPK(indx(end-L+1:end)) = [];  % Remove upto 3 zeros
+end 
+
+if ( isnan ( IPK )  )
+    return
+end
+
+if ( min(IPK) <= 0 || max(IPK) > 1e5 )
+%    v = 0;
+    return
+end
+
+% if ( OPctrl.Ipklvl < OPctrl.bufSize )
+%     OPctrl.Ipklvl                            = OPctrl.Ipklvl + 1;
+% else
+%     OPctrl.IpkBuf ( 1 : OPctrl.bufSize - 1 ) = OPctrl.IpkBuf ( 2 : OPctrl.bufSize );
+% end
+% 
+% OPctrl.IpkBuf ( OPctrl.Ipklvl )   = IPK;
+
+
+%v                                 = mean ( OPctrl.IpkBuf ( 1 : OPctrl.Ipklvl ) );
+v                                  = mean (IPK);
+end
+
+
+function [ v, t ] = getBunchLength_Actual ( PV )
+
+% Calculate Actual
+
+global OP;
+global OPctrl;
+global PhysicsConsts;
+
+v         = NaN;
+t         = NaN;
+[ v, t ]  = lcaGet ( PV );                                % To get timestamp in correct format
+
+IPK        = OP { OPctrl.ID.BC2_IPK       }.Actual;       % A
+Q          = OP { OPctrl.ID.BunchCharge   }.Actual;       % nC
+
+if ( IPK == 0 )
+    return
+end
+
+v          = Q * PhysicsConsts.c / ( 1000 * sqrt ( 12 ) * IPK );  % microns
+
+end
+
+
+function v = getBunchLength_Target ( PV )
+
+% Calculate Target
+
+global OP;
+global OPctrl;
+global PhysicsConsts;
+
+IPK        = OP { OPctrl.ID.BC2_IPK       }.Target;       % A
+Q          = OP { OPctrl.ID.BunchCharge   }.Target;       % nC
+
+v          = Q * PhysicsConsts.c / ( 1000 * sqrt ( 12 ) * IPK );  % microns
+
+end
+
+
+function v = getBunchLength_Tol ( PV )
+
+% Calculate Tolerance
+
+global OP;
+global OPctrl;
+
+v          = OP { OPctrl.ID.BC2_BLEN      }.Target * 0.1;       % microns
+
+end
+
+
+function [ v, t ] = getBmagEmittanceActual ( epsPV )
+
+% Calculate Actual
+
+BmagPV = strrep ( epsPV, 'EMITN', 'BMAG' );
+
+v         = NaN;
+t         = NaN;
+
+[ Bmag, t ] = lcaGet ( BmagPV );
+[ eps,  t ] = lcaGet ( epsPV  );                               % microns
+
+v = Bmag * eps;
+
+end
+
+
+function [ v,t ] = getFEL_Emittance_Actual ( PV )
+
+% Calculate Actual
+
+global OP;
+global OPctrl;
+
+v         = NaN;
+t         = NaN;
+
+[ v,  t ] = lcaGet ( PV  );                               % microns; for timestamp retreval, only
+
+eps_x       = OP { OPctrl.ID.OTR2_P_EMITN_X }.Actual;
+eps_y       = OP { OPctrl.ID.OTR2_P_EMITN_Y }.Actual;
+
+v = sqrt ( eps_x * eps_y );
+
+end
+
+
+function v = getFEL_Emittance_Target ( PV )
+
+% Calculate Actual
+
+global OP;
+global OPctrl;
+
+v         = NaN;
+
+eps_x       = OP { OPctrl.ID.OTR2_P_EMITN_X }.Actual;
+eps_y       = OP { OPctrl.ID.OTR2_P_EMITN_Y }.Actual;
+
+v = sqrt ( eps_x * eps_y );
+
+end
+
+
+function v = get_lambda_r_Target ( PV )
+
+% Calculate Actual
+
+global OP;
+global OPctrl;
+global PhysicsConsts;
+global UndulatorConsts;
+global FELp_Target;
+
+Ipk         = OP { OPctrl.ID.BC2_IPK }.Target;
+eps         = OP { OPctrl.ID.FEL_P_EMITN }.Target;
+Energy      = OP { OPctrl.ID.FinalEnergy }.Target;
+gamma       = Energy / PhysicsConsts.mc2_e;
+B_L         = OP { OPctrl.ID.BC2_BLEN }.Target;
+dgamma      = 2.8;
+
+FELp_Target = util_LCLS_FEL_Performance_Estimate ( Energy, eps, Ipk, B_L, dgamma );
+
+v           = UndulatorConsts.lambda_u * ( 1 + UndulatorConsts.K_nominal^2 / 2 ) / ( 2 * gamma^2 ) / 1e9;  % nm
+
+end
+
+
+function [ v, t ] = get_lambda_r_Actual ( PV )
+
+% Calculate Actual
+
+global OP;
+global OPctrl;
+global PhysicsConsts;
+global UndulatorConsts;
+global FELp_Actual;
+
+v         = NaN;
+t         = NaN;
+[ E, t ]  = getFinalEnergy_Actual ( PV );
+
+
+% gamma      = E / PhysicsConsts.mc2_e;
+% 
+% 
+ Ipk         = OP { OPctrl.ID.BC2_IPK }.Actual;
+ eps         = OP { OPctrl.ID.FEL_P_EMITN }.Actual;
+ Energy      = E;
+ B_L         = OP { OPctrl.ID.BC2_BLEN }.Actual;
+ dgamma      = 2.8;
+% 
+FELp_Actual = util_LCLS_FEL_Performance_Estimate ( Energy, eps, Ipk, B_L, dgamma );
+% 
+% v           = UndulatorConsts.lambda_u * ( 1 + UndulatorConsts.K_nominal^2 / 2 ) / ( 2 * gamma^2 ) / 1e9;  % nm
+
+% William Colocho: Use Welch energy number to calculate lambda
+[E t] = lcaGetSmart('SIOC:SYS0:ML00:AO627');
+
+v           = 1/E *  PhysicsConsts.h_bar*2*pi*PhysicsConsts.c  / PhysicsConsts.echarge * 1e9;
+
+end
+
+
+function [ v, t ] = get_L_sat_Actual ( PV )
+
+% Calculate Actual
+
+global OP;
+global OPctrl;
+global FELp_Actual;
+
+v         = NaN;
+t         = NaN;
+
+[ E, t ]  = lcaGet ( PV ); 
+v         = FELp_Actual.L_sat_c;
+Q         = OP{ OPctrl.ID.FEL_Charge }.Target;
+
+if ( Q < 0.005 )
+    v = NaN;
+end
+
+
+end
+
+
+function v = get_L_sat_Target ( PV )
+
+% Calculate Target
+
+global FELp_Target;
+
+v = FELp_Target.L_sat_c;
+
+end
+
+
+function v = get_L_sat_Tolerance ( j )
+
+% Calculate Tolerance
+
+global FELp_Target;
+
+v = FELp_Target.L_sat_c * 1.2;
+
+end
+
+
+function [ v, t ] = get_P_out_Actual ( PV )
+
+% Calculate Actual
+
+global OP;
+global OPctrl;
+global FELp_Actual;
+
+v         = NaN;
+t         = NaN;
+
+[ E, t ]   = lcaGet ( PV ); 
+v          = FELp_Actual.P_out_c * 1E-9;   % GW
+
+Q          = OP { OPctrl.ID.FEL_Charge }.Actual;
+
+if ( Q < 0.005 )
+    v = 0;
+end
+
+end
+
+
+function v = get_P_out_Target ( PV )
+
+% Calculate Target
+
+global OP;
+global OPctrl;
+global FELp_Target;
+
+v = FELp_Target.P_out_c * 1E-9;   % GW
+Q = OP { OPctrl.ID.FEL_Charge }.Target;
+
+if ( Q < 0.005 )
+    v = 0;
+end
+
+end
+
+
+function v = get_P_out_Tolerance ( j )
+
+% Calculate Tolerance
+
+global FELp_Target;
+
+v = FELp_Target.P_out_c * 1E-9 * 0.8;   % GW
+
+end
+
+
+function [ v, t ] = get_Pulse_Len_Actual ( PV )
+
+% Calculate Actual
+% William: use ltuQ in case we use BC1 collimation to cut horns.
+
+global OP;
+global OPctrl;
+
+v         = NaN;
+t         = NaN;
+[ ltuQ, t ]  = lcaGet ( PV );   % To get timestamp in correct format
+
+
+Ipk        = OP { OPctrl.ID.BC2_IPK }.Actual;             % A
+Q          = OP { OPctrl.ID.BunchCharge   }.Actual;       % nC
+
+if Ipk == 0, return, end
+
+
+if ( Q < 0.005 )
+    v = 0;
+else
+    v = 1e6 * ltuQ/1e3 / Ipk;
+end
+
+
+
+end
+

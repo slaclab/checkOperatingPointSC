@@ -159,7 +159,7 @@
       <string/>
      </property>
      <property name="text">
-      <string>Can range from 5pC to 300pC</string>
+      <string>Can range from ~5pC to 300pC</string>
      </property>
     </widget>
    </item>
@@ -183,7 +183,7 @@
       <string/>
      </property>
      <property name="text">
-      <string>diameter</string>
+      <string>Diameter</string>
      </property>
     </widget>
    </item>
